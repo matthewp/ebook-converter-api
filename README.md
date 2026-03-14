@@ -34,6 +34,15 @@ Set the `API_KEY` environment variable to require a Bearer token on all endpoint
 
 ## Running
 
+Pre-built images are available from GitHub Container Registry:
+
+```bash
+podman pull ghcr.io/matthewp/ebook-converter-api:latest
+podman run -d -p 8000:8000 -e API_KEY=your-secret ghcr.io/matthewp/ebook-converter-api:latest
+```
+
+To build from source:
+
 ```bash
 podman build -t ebook-converter-api .
 podman run -d -p 8000:8000 -e API_KEY=your-secret ebook-converter-api
