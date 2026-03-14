@@ -7,6 +7,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
 PORT = int(os.environ.get("PORT", "8000"))
+API_KEY = os.environ.get("API_KEY", "")
 
 INPUT_FORMATS = {
     "epub", "mobi", "azw3", "azw4", "docx", "odt", "txt", "rtf",
@@ -46,9 +47,21 @@ def parse_multipart(content_type, body):
 
 
 class ConvertHandler(BaseHTTPRequestHandler):
+    def _check_auth(self):
+        if not API_KEY:
+            return True
+        auth = self.headers.get("Authorization", "")
+        if auth == f"Bearer {API_KEY}":
+            return True
+        self._json(401, {"error": "Invalid or missing API key"})
+        return False
+
     def do_GET(self):
         if self.path == "/health":
             self._json(200, {"status": "ok"})
+            return
+
+        if not self._check_auth():
             return
 
         if self.path == "/formats":
@@ -61,6 +74,9 @@ class ConvertHandler(BaseHTTPRequestHandler):
         self.send_error(404)
 
     def do_POST(self):
+        if not self._check_auth():
+            return
+
         if self.path != "/convert":
             self.send_error(404)
             return

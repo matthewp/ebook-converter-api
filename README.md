@@ -15,7 +15,9 @@ Convert an ebook file to a different format.
 **Response:** the converted file as `application/octet-stream`
 
 ```bash
-curl -F file=@book.epub -F format=mobi http://localhost:8000/convert -o book.mobi
+curl -H "Authorization: Bearer YOUR_KEY" \
+  -F file=@book.epub -F format=mobi \
+  http://localhost:8000/convert -o book.mobi
 ```
 
 ### `GET /formats`
@@ -26,9 +28,13 @@ List supported input and output formats.
 
 Health check. Returns `{"status": "ok"}`.
 
+## Authentication
+
+Set the `API_KEY` environment variable to require a Bearer token on all endpoints (except `/health`). If unset, no authentication is required.
+
 ## Running
 
 ```bash
 podman build -t ebook-converter-api .
-podman run -d -p 8000:8000 ebook-converter-api
+podman run -d -p 8000:8000 -e API_KEY=your-secret ebook-converter-api
 ```
